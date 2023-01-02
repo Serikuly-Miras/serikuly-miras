@@ -1,12 +1,11 @@
 import taichi as ti
-import numpy as np
 
 
 @ti.data_oriented
 class NeuralCellularAutomata:
     def __init__(self, vp: tuple, scale_factor: int) -> None:
         # Innit taichi on gpu
-        ti.init(arch=ti.cpu, dynamic_index=True)
+        ti.init(arch=ti.cuda, dynamic_index=True)
 
         self.vp = vp
         self.scale_factor = scale_factor
@@ -23,14 +22,15 @@ class NeuralCellularAutomata:
 
         self.fill_random()
 
-    def record(self, frames: int, fps: int) -> None:
+    def record(self, frames: int, fps: int, speed: int) -> None:
         result_dir = "./results"
         video_manager = ti.tools.VideoManager(
             output_dir=result_dir, framerate=fps, automatic_build=False)
 
         for i in range(frames):
-            self.update_grid()
-            self.update_grid()
+            for j in range(speed):
+                self.update_grid()
+                self.update_grid()
             self.paint()
 
             video_manager.write_frame(self.pixels.to_numpy())
